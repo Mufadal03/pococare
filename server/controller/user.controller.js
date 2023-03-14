@@ -4,7 +4,7 @@ const { userModel } = require('../model/userModel')
 require('dotenv').config()
 const generateToken ={
     token:(user) => jwt.sign({ user }, process.env.JWT_SECRET, {
-        expiresIn: "1m",
+        expiresIn: "10m",
     }),
     refreshToken:(user)=>jwt.sign({ username:user.name }, process.env.REFRESH_TOKEN_SECRET, {
         expiresIn: "24h",
