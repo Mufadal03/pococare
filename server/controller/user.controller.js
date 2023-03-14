@@ -4,15 +4,15 @@ const { userModel } = require('../model/userModel')
 require('dotenv').config()
 const generateToken ={
     token:(user) => jwt.sign({ user }, process.env.JWT_SECRET, {
-        expiresIn: "10m",
+        expiresIn: "1m",
     }),
-    refreshToken:(user)=>jwt.sign({ user }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "1d",
+    refreshToken:(user)=>jwt.sign({ username:user.name }, process.env.REFRESH_TOKEN_SECRET, {
+        expiresIn: "24h",
     })
 }
 const signup = async(req,res) => {
     const { username, email, password } = req.body 
-
+    console.log(username)
     const user = await userModel.findOne({ email })
     if(user)return res.status(400).send({response:'User Already Exists',success:false})
     try {
@@ -48,7 +48,7 @@ const login = async(req,res) => {
                     httpOnly: true,
                     maxAge: 24 *60* 60 * 1000
                 })
-                res.status(200).send({response:"Login Successfully",token,refreshToken})
+                res.status(200).send({response:"Login Successfully",token,refreshToken,success:true})
             }
        })
     } catch (error) {
@@ -58,16 +58,16 @@ const login = async(req,res) => {
 
 const refresh = async(req, res) => {
     const { refreshToken } = req.body 
-    if (!refreshToken) return res.status(400).send({ response: 'refresh token Invalid' })
+    if (!refreshToken) return res.status(400).send({ response: 'refresh token Invalid' ,success:false})
         jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-            if (err) return res.status(401).send({ response: 'Refresh token expired' ,err})
+            if (err) return res.status(401).send({ response: 'Refresh token expired' ,err,success:false})
             else {
                 const token = generateToken.token(decoded.user)
                 res.cookie('token', token, {
                     httpOnly: true,
                     maxAge: 24 * 60 * 60 * 1000
                 })
-                res.status(201).send({response:'Token generated',token})
+                res.status(201).send({response:'Token generated',token,success:true})
            }
        })
     
