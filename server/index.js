@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 8080
 
 
 app.get('/', (req, res) => {
-    res.send('running')
+    res.send('running good')
 })
 
 app.use('/user',userRoutes)
